@@ -1,8 +1,7 @@
 <?php
 
+include ('config.php');
 
-include ('../classes/Database.class.php');
-include ('../classes/Work.php');
 
 //Headers
 header('Content-Type: application/json');
@@ -36,8 +35,7 @@ switch($method) {
             $result = $work->readOneWork($id);
         } else {
             //function to read data from table
-            $result = $work->readWork();
-            
+            $result = $work->readWork();       
         }
 
         //Check if result isn't empty
@@ -113,7 +111,7 @@ switch($method) {
 }
 
 //return result as json
-echo json_encode($result);
+echo json_encode($result, JSON_PRETTY_PRINT);
 
 //close database connection
 $db = $database->close();

@@ -1,12 +1,12 @@
 <?php
 include ('classes/Database.class.php');
-include('includes/config.php');
+include('API/config.php');
 
 /* Anslut till databasen */
 //connect to database
 $database = new Database();
 $db = $database->connect();
-
+/*
 // First query
 $sql = 'DROP TABLE IF EXISTS education;';
 $sql .= '
@@ -52,7 +52,7 @@ if($stmt->execute()) {
 } else {
    echo '<p>Gick inte att lägga till tabellen "work"</p>';
 }
-
+*/
 // Third query
 $sql = 'DROP TABLE IF EXISTS websites;';
 $sql .= '
@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `websites` (
    `ws_title` VARCHAR(100) NOT NULL UNIQUE,
    `ws_url` VARCHAR(100) NOT NULL,
    `ws_description` TEXT NOT NULL,
+   `ws_image` VARCHAR(100),
    `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
    PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8';
@@ -73,7 +74,28 @@ if($stmt->execute()) {
 } else {
    echo '<p>Gick inte att lägga till tabellen "websites"</p>';
 }
+/*
+// Fourth query
+$sql = 'DROP TABLE IF EXISTS images;';
+$sql .= '
+CREATE TABLE IF NOT EXISTS `images` (
+   `id` INT(11) NOT NULL AUTO_INCREMENT,
+   `fileName` VARCHAR(100) NOT NULL UNIQUE,
+   `ws_title` VARCHAR(100) NOT NULL UNIQUE,
+   `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`),
+   FOREIGN KEY(`ws_title`) REFERENCES websites(`ws_title`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8';
 
+// Prepare the query and execute it
+$stmt = $db->prepare($sql);
+if($stmt->execute()) {
+   echo '<p>Tabellen "images" har lagts till</p>';
+   echo '<pre>' . $sql . '</pre>';
+} else {
+   echo '<p>Gick inte att lägga till tabellen "images"</p>';
+}
+*/
 // Close connection
 $db = $database->close();
 

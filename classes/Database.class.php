@@ -2,10 +2,10 @@
 
 class Database {
     //database settings
-    private $host = 'studentmysql.miun.se'; //localhost;8080
-    private $db_name = 'elku1901'; //elin_cv
-    private $username = 'elku1901'; //elin_cv
-    private $password = 'fkdd7cpm'; //elin_cv
+    private $host = DBHOST; 
+    private $db_name = DBDATABASE; 
+    private $username = DBUSER; 
+    private $password = DBPASS; 
     private $conn;
     
     //connect to database

@@ -1,7 +1,8 @@
 <?php
 
-include ('config.php');
 
+include ('../classes/Database.class.php');
+include ('../classes/Images.class.php');
 
 //Headers
 header('Content-Type: application/json');
@@ -22,9 +23,9 @@ if(isset($_GET['id'])) {
 $database = new Database();
 $db = $database->connect();
 
-//instansiate class Education for sql-queries
+//instansiate class Courses for sql-queries
 //send database-connection as parameter
-$education = new Education($db);
+$images = new Images($db);
 
 
 
@@ -32,10 +33,11 @@ switch($method) {
     case 'GET':
         if(isset($id)) {
             //function to read row with specific id
-            $result = $education->readOneEdu($id);
+            $result = $images->readOneImage($id);
         } else {
             //function to read data from table
-            $result = $education->readEdu();
+            $result = $images->readImages();
+            
         }
 
         //Check if result isn't empty
@@ -49,20 +51,43 @@ switch($method) {
     case 'POST':
         $data = json_decode(file_get_contents("php://input"));
 
-        //Remove tags and make special characters availble to store
+                // check if image is correct type and size
+
+        if(count($_FILES['file']) > 0) {
+            $target_dir = "../images/";
+            $target_file = $target_dir . basename($_FILES["file"]["name"]);
+            $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+
+            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+                $uploadOk = 0;
+                echo "Felmeddelande: Endast JPG, JPEG och PNG är tillåtet.";
+            } else {
+                //check that image hasn't same name as other file
+                if (file_exists("../images/" . $_FILES['file']['name'])) {
+                    echo $_FILES['file']['name'] . " finns redan". " Välj ett annat filnamn.";
+                } else {
+                    //move image to right folder
+                    move_uploaded_file($_FILES["file"]["tmp_name"], $target_file);
+
+                    //Save name original file
+                    $storedfile = $_FILES['file']['name'];
+                    return $storedfile;
+                }
+            }
+        }
+
+        //Remove tags and makes special characters availble to store
         //and send input to the class proterties
-        $education->edu_school = $data->edu_school;
-        $education->edu_name = $data->edu_name;
-        $education->edu_start = $data->edu_start;
-        $education->edu_stop = $data->edu_stop;
+        $images->ws_title = $data->ws_title;
+        $images->storedfile = $data->storedfile;
 
         //Function to create row
-        if($education->create($data->edu_school, $data->edu_name, $data->edu_start, $data->edu_stop)) {
+        if($images->createImage($storedfile, $data->ws_title)) {
             http_response_code(201); //created
-            $result = array("message" => "Kurs tillagd");
+            $result = array("message" => "Bild tillagd");
         } else {
             http_response_code(503); //Server error
-            $result = array("message" => "Kurs EJ tillagd");
+            $result = array("message" => "Bild EJ tillagd");
         }
     break;
     case 'PUT':
@@ -74,20 +99,17 @@ switch($method) {
             $data = json_decode(file_get_contents("php://input"));
         }
         
-        //Remove tags and make special characters availble to store
+        //Remove tags and makes special characters availble to store
         //and send input to the class proterties
-        $education->edu_school = $data->edu_school;
-        $education->edu_name = $data->edu_name;
-        $education->edu_start = $data->edu_start;
-        $education->edu_stop = $data->edu_stop;
+        $images->ws_title = $data->ws_title;
 
         //run function for update row
-        if($education->updateEdu($id, $data->edu_school, $data->edu_name, $data->edu_start, $data->edu_stop)) {
+        if($images->updateImage($id, $storedfile, $data->ws_title)) {
             http_response_code(200); //ok
-            $result = array("message" => "Kursen är uppdaterad");
+            $result = array("message" => "Bilden är uppdaterad");
         } else {
             http_response_code(503); //server error
-            $result = array("message" => "Kursen är inte uppdaterad");
+            $result = array("message" => "Bilden är inte uppdaterad");
         }
     break;
     case 'DELETE':
@@ -98,10 +120,10 @@ switch($method) {
         } else {
             if($education->deleteEdu($id)) {
                 http_response_code(200); //ok
-                $result = array("message" => "Kursen är raderad");
+                $result = array("message" => "Bilden är raderad");
             } else {
                 http_response_code(503); //Server error
-                $result = array("message" => "Kursen är inte raderad");
+                $result = array("message" => "Bilden är inte raderad");
             }
         }
     break;
@@ -109,7 +131,7 @@ switch($method) {
 }
 
 //return result as json
-echo json_encode($result, JSON_PRETTY_PRINT);
+echo json_encode($result);
 
 //close database connection
 $db = $database->close();

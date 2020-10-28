@@ -15,7 +15,7 @@ class Education {
 
 
     public function readEdu() {
-        $sql = "SELECT * FROM elku1901.education";
+        $sql = "SELECT * FROM elku1901.education ORDER by edu_stop DESC";
 
         // Prepare and execute statement
         $stmt = $this->conn->prepare($sql);

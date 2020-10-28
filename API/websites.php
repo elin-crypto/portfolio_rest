@@ -1,8 +1,7 @@
 <?php
 
+include ('config.php');
 
-include ('../classes/Database.class.php');
-include ('../classes/Websites.php');
 
 //Headers
 header('Content-Type: application/json');
@@ -49,31 +48,6 @@ switch($method) {
         }
         break;
     case 'POST':
-
-        // check if image is correct type and size
-/*
-        if(count($_FILES['file']) > 0) {
-            $target_dir = "../images/";
-            $target_file = $target_dir . basename($_FILES["file"]["name"]);
-            $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-
-            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-                $uploadOk = 0;
-                echo "Felmeddelande: Endast JPG, JPEG och PNG är tillåtet.";
-            } else {
-                //check that image hasn't same name as other file
-                if (file_exists("images/" . $_FILES['file']['name'])) {
-                    echo $_FILES['file']['name'] . " finns redan". " Välj ett annat filnamn.";
-                } else {
-                    //move image to right folder
-                    move_uploaded_file($_FILES["file"]["tmp_name"], $target_file);
-
-                    //Save name original file
-                    $storedfile = $_FILES['file']['name'];
-                    return $storedfile;
-                }
-            }
-        }*/
         $data = json_decode(file_get_contents("php://input"));
 
         //Remove tags and makes special characters availble to store
@@ -81,11 +55,11 @@ switch($method) {
         $websites->ws_title = $data->ws_title;
         $websites->ws_url = $data->ws_url;
         $websites->ws_description = $data->ws_description;
-        //$websites->ws_image = $storedfile;
+        //$websites->ws_image = $data->ws_image;
         
-  
+
         //Function to create row
-        if($websites->create($data->ws_title, $data->ws_url, $data->ws_description/*, $storedfile*/)) {
+        if($websites->create($data->ws_title, $data->ws_url, $data->ws_description/*, $filePath*/)) {
             http_response_code(201); //created
             $result = array("message" => "Webbplats tillagd");
         } else {
@@ -138,15 +112,8 @@ switch($method) {
 
 
 
-
-
-
-
-
-
-
 //return result as json
-echo json_encode($result);
+echo json_encode($result, JSON_PRETTY_PRINT);
 
 //close database connection
 $db = $database->close();
@@ -162,6 +129,40 @@ $db = $database->close();
 
 
 
+/* FUNKAR INTE 
+ if(isset($_FILES)) {
 
+            $uploadDir = 'http://studenter.miun.se/~elku1901/writeable/projektAdmin/'.'images/'; 
+            $fileName = $_FILES["file"]["name"];
+            $filePath = $uploadDir . $fileName;
+            
+            if(move_uploaded_file($_FILES['file']['tmp_name'], "../images/" . $_FILES["file"]["name"])) {
+                $data = json_decode(file_get_contents("php://input"));
+
+                //Remove tags and makes special characters availble to store
+                //and send input to the class proterties
+                $websites->ws_title = $data->ws_title;
+                $websites->ws_url = $data->ws_url;
+                $websites->ws_description = $data->ws_description;
+                //$websites->ws_image = $data->ws_image;
+                
+        
+                //Function to create row
+                if($websites->create($data->ws_title, $data->ws_url, $data->ws_description, $filePath)) {
+                    http_response_code(201); //created
+                    $result = array("message" => "Webbplats tillagd");
+                } else {
+                    http_response_code(503); //Server error
+                    $result = array("message" => "Webbplats EJ tillagd");
+                }
+          
+            } else {
+                $result = array("message" => 'File not uploaded');
+            }
+         
+            $result = array("message" => 'en fil uppladdas'. $fileName);
+        } else {
+            $result = array("message" => 'Det funkar inte' . $fileName);
+        } */
 
 
