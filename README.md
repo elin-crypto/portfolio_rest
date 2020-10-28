@@ -9,4 +9,6 @@ REST-webbtjänst med CRUD-funktionalitet (Create, Read, Update och Delete)
 
 Webbtjänsten konsumeras av två webbplatser: 
 - Ett lösenordsskyddat administrationsgränssnitt för hantering av data
+    http://studenter.miun.se/~elku1901/dt173g/Projekt/portfolioPrivate/ 
 - En webbportfolio för att visa upp mina skapade webbplatser samt CV
+    http://studenter.miun.se/~elku1901/dt173g/Projekt/portfolioFetch/
